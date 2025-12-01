@@ -1,52 +1,70 @@
 # MacMouseMover
 
-A minimal macOS menubar app that keeps your Mac awake by sending invisible mouse movements.
+A lightweight, open-source macOS menubar app that prevents your Mac from sleeping by simulating subtle mouse movements.
+
+Perfect for keeping your screen awake during presentations, long downloads, or when you need to appear "active" while working remotely.
 
 ## Features
 
-- Menubar-only app (no dock icon, no window)
-- Toggle mouse jiggler on/off
-- Schedule automatic start/stop times (separate weekday/weekend schedules)
-- Tiny 1-pixel movement for reliable wake detection (cursor returns to original position)
-- Settings persist across app restarts
-- Launch at login option
-- Left-click menubar icon to toggle, right-click for settings (Caffeine-style)
-- Pause on battery power option (auto-resumes when plugged in)
+- **Menubar-only** — lives quietly in your menubar, no dock icon or windows
+- **One-click toggle** — left-click to turn on/off, right-click for settings
+- **Scheduling** — set different schedules for weekdays and weekends
+- **Battery-aware** — optionally pause when running on battery power
+- **Launch at login** — start automatically when you log in
+- **Invisible movement** — tiny 1-pixel movement that returns to original position
+- **Persistent settings** — remembers your preferences across restarts
+
+## Privacy & Security
+
+This app is fully open-source. You can inspect every line of code before building. It:
+
+- Collects **no data**
+- Makes **no network requests**
+- Requires only Accessibility permission (to move the mouse)
+- Stores settings locally via UserDefaults
 
 ## Requirements
 
-- macOS 13.0 or later
-- Swift 5.9+
+- macOS 13.0 (Ventura) or later
+- Swift 5.9+ (for building from source)
 
-## Build & Run
+## Installation
+
+### Build from Source
 
 ```bash
-git clone https://github.com/yourusername/MacMouseMover.git
+git clone https://github.com/Mazurevitz/MacMouseMover.git
 cd MacMouseMover
-swift build
-.build/debug/MacMouseMover
+swift build -c release
 ```
 
-## Install as App
+### Install to Applications
 
 ```bash
-swift build -c release
 mkdir -p /Applications/MacMouseMover.app/Contents/MacOS
 cp .build/release/MacMouseMover /Applications/MacMouseMover.app/Contents/MacOS/
 cp Sources/MacMouseMover/Info.plist /Applications/MacMouseMover.app/Contents/
 ```
 
-Then launch from Applications or Spotlight.
+Then launch from **Applications** or **Spotlight**.
 
 ## Usage
 
-- **Left-click** the menubar icon to toggle jiggler on/off
-- **Right-click** to open settings
+| Action | Result |
+|--------|--------|
+| Left-click menubar icon | Toggle jiggler on/off |
+| Right-click menubar icon | Open settings |
 
 ## Permissions
 
-On first run, grant Accessibility permission in **System Settings > Privacy & Security > Accessibility** to allow mouse event posting.
+On first launch, macOS will prompt you to grant Accessibility permission. This is required to simulate mouse movement.
+
+**System Settings → Privacy & Security → Accessibility → Enable MacMouseMover**
+
+## Contributing
+
+Contributions are welcome! Feel free to open issues or submit pull requests.
 
 ## License
 
-MIT
+MIT License — free to use, modify, and distribute.
