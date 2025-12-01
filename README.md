@@ -4,7 +4,7 @@ A lightweight, open-source macOS menubar app that prevents your Mac from sleepin
 
 Perfect for keeping your screen awake during presentations, long downloads, or when you need to appear "active" while working remotely.
 
-![MacMouseMover Screenshot](screenshot.png)
+![MacMouseMover Screenshot](screenshot.jpg)
 
 ## Features
 
