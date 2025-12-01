@@ -1,8 +1,13 @@
 import Foundation
 
 final class Schedule: ObservableObject {
-    @Published var isEnabled: Bool = false {
+    private static let isEnabledKey = "Schedule.isEnabled"
+    private static let startTimeKey = "Schedule.startTime"
+    private static let stopTimeKey = "Schedule.stopTime"
+
+    @Published var isEnabled: Bool = UserDefaults.standard.bool(forKey: Schedule.isEnabledKey) {
         didSet {
+            UserDefaults.standard.set(isEnabled, forKey: Schedule.isEnabledKey)
             if isEnabled {
                 startScheduleTimer()
             } else {
@@ -12,8 +17,25 @@ final class Schedule: ObservableObject {
         }
     }
 
-    @Published var startTime: Date = Calendar.current.date(from: DateComponents(hour: 9, minute: 0)) ?? Date()
-    @Published var stopTime: Date = Calendar.current.date(from: DateComponents(hour: 17, minute: 0)) ?? Date()
+    @Published var startTime: Date = UserDefaults.standard.object(forKey: Schedule.startTimeKey) as? Date
+        ?? Calendar.current.date(from: DateComponents(hour: 9, minute: 0)) ?? Date() {
+        didSet {
+            UserDefaults.standard.set(startTime, forKey: Schedule.startTimeKey)
+        }
+    }
+
+    @Published var stopTime: Date = UserDefaults.standard.object(forKey: Schedule.stopTimeKey) as? Date
+        ?? Calendar.current.date(from: DateComponents(hour: 17, minute: 0)) ?? Date() {
+        didSet {
+            UserDefaults.standard.set(stopTime, forKey: Schedule.stopTimeKey)
+        }
+    }
+
+    init() {
+        if isEnabled {
+            startScheduleTimer()
+        }
+    }
 
     var onScheduleChange: ((Bool) -> Void)?
 

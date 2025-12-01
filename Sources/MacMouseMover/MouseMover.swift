@@ -3,13 +3,22 @@ import CoreGraphics
 import AppKit
 
 final class MouseMover: ObservableObject {
-    @Published var isRunning: Bool = false {
+    private static let isRunningKey = "MouseMover.isRunning"
+
+    @Published var isRunning: Bool = UserDefaults.standard.bool(forKey: MouseMover.isRunningKey) {
         didSet {
+            UserDefaults.standard.set(isRunning, forKey: MouseMover.isRunningKey)
             if isRunning {
                 startJiggling()
             } else {
                 stopJiggling()
             }
+        }
+    }
+
+    init() {
+        if isRunning {
+            startJiggling()
         }
     }
 
