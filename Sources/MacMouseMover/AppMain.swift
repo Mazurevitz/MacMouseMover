@@ -6,10 +6,29 @@ class AppState: ObservableObject {
     @Published var mouseMover = MouseMover()
     @Published var schedule = Schedule()
     @Published var launchAtLogin = LaunchAtLogin()
+    @Published var powerMonitor = PowerMonitor()
+
+    private var wasRunningBeforeBattery = false
 
     private init() {
         schedule.onScheduleChange = { [weak self] shouldRun in
             self?.mouseMover.isRunning = shouldRun
+        }
+
+        powerMonitor.onPowerChange = { [weak self] isOnBattery in
+            guard let self = self else { return }
+            if isOnBattery {
+                self.wasRunningBeforeBattery = self.mouseMover.isRunning
+                if self.mouseMover.isRunning {
+                    self.mouseMover.isRunning = false
+                    NotificationCenter.default.post(name: NSNotification.Name("UpdateIcon"), object: nil)
+                }
+            } else {
+                if self.wasRunningBeforeBattery {
+                    self.mouseMover.isRunning = true
+                    NotificationCenter.default.post(name: NSNotification.Name("UpdateIcon"), object: nil)
+                }
+            }
         }
     }
 }
@@ -104,6 +123,9 @@ struct MenuBarView: View {
                 .toggleStyle(.switch)
 
             Toggle("Enable Schedule", isOn: $appState.schedule.isEnabled)
+                .toggleStyle(.switch)
+
+            Toggle("Pause on Battery", isOn: $appState.powerMonitor.pauseOnBattery)
                 .toggleStyle(.switch)
 
             if appState.schedule.isEnabled {

@@ -11,10 +11,7 @@ A minimal macOS menubar app that keeps your Mac awake by sending invisible mouse
 - Settings persist across app restarts
 - Launch at login option
 - Left-click menubar icon to toggle, right-click for settings (Caffeine-style)
-
-## Roadmap
-
-- [ ] Pause when on battery power
+- Pause on battery power option (auto-resumes when plugged in)
 
 ## Requirements
 
