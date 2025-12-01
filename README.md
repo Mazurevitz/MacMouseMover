@@ -8,6 +8,14 @@ A minimal macOS menubar app that keeps your Mac awake by sending invisible mouse
 - Toggle mouse jiggler on/off
 - Schedule automatic start/stop times
 - Invisible mouse movement (cursor doesn't visibly jump)
+- Settings persist across app restarts
+- Launch at login option
+- Left-click menubar icon to toggle, right-click for settings (Caffeine-style)
+
+## Roadmap
+
+- [ ] Actual tiny pixel movement for better compatibility
+- [ ] Pause when on battery power
 
 ## Requirements
 

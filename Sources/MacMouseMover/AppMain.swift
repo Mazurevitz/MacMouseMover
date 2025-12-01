@@ -1,46 +1,124 @@
 import SwiftUI
+import AppKit
+
+class AppState: ObservableObject {
+    static let shared = AppState()
+    @Published var mouseMover = MouseMover()
+    @Published var schedule = Schedule()
+    @Published var launchAtLogin = LaunchAtLogin()
+
+    private init() {
+        schedule.onScheduleChange = { [weak self] shouldRun in
+            self?.mouseMover.isRunning = shouldRun
+        }
+    }
+}
+
+class AppDelegate: NSObject, NSApplicationDelegate {
+    private var statusItem: NSStatusItem!
+    private var popover: NSPopover!
+    private var eventMonitor: Any?
+
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+
+        if let button = statusItem.button {
+            updateIcon()
+            button.action = #selector(handleClick(_:))
+            button.sendAction(on: [.leftMouseUp, .rightMouseUp])
+        }
+
+        popover = NSPopover()
+        popover.contentSize = NSSize(width: 220, height: 200)
+        popover.behavior = .transient
+        popover.contentViewController = NSHostingController(
+            rootView: MenuBarView()
+                .environmentObject(AppState.shared)
+        )
+
+        eventMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { [weak self] _ in
+            if self?.popover.isShown == true {
+                self?.popover.performClose(nil)
+            }
+        }
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(updateIcon),
+            name: NSNotification.Name("UpdateIcon"),
+            object: nil
+        )
+    }
+
+    @objc func handleClick(_ sender: NSStatusBarButton) {
+        guard let event = NSApp.currentEvent else { return }
+
+        if event.type == .rightMouseUp {
+            showPopover()
+        } else {
+            AppState.shared.mouseMover.isRunning.toggle()
+            updateIcon()
+        }
+    }
+
+    func showPopover() {
+        if let button = statusItem.button {
+            popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
+        }
+    }
+
+    @objc func updateIcon() {
+        if let button = statusItem.button {
+            let iconName = AppState.shared.mouseMover.isRunning ? "cursorarrow.motionlines" : "cursorarrow"
+            button.image = NSImage(systemSymbolName: iconName, accessibilityDescription: "Mouse Mover")
+        }
+    }
+}
 
 @main
 struct MacMouseMoverApp: App {
-    @StateObject private var mouseMover = MouseMover()
-    @StateObject private var schedule = Schedule()
+    @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     var body: some Scene {
-        MenuBarExtra("Mouse Mover", systemImage: mouseMover.isRunning ? "cursorarrow.motionlines" : "cursorarrow") {
-            MenuBarView(mouseMover: mouseMover, schedule: schedule)
+        Settings {
+            EmptyView()
         }
-        .menuBarExtraStyle(.window)
     }
 }
 
 struct MenuBarView: View {
-    @ObservedObject var mouseMover: MouseMover
-    @ObservedObject var schedule: Schedule
+    @EnvironmentObject var appState: AppState
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Toggle("Mouse Jiggler", isOn: $mouseMover.isRunning)
+            Toggle("Mouse Jiggler", isOn: $appState.mouseMover.isRunning)
                 .toggleStyle(.switch)
                 .font(.headline)
+                .onChange(of: appState.mouseMover.isRunning) { _ in
+                    NotificationCenter.default.post(name: NSNotification.Name("UpdateIcon"), object: nil)
+                }
 
             Divider()
 
-            Toggle("Enable Schedule", isOn: $schedule.isEnabled)
+            Toggle("Launch at Login", isOn: $appState.launchAtLogin.isEnabled)
                 .toggleStyle(.switch)
 
-            if schedule.isEnabled {
+            Toggle("Enable Schedule", isOn: $appState.schedule.isEnabled)
+                .toggleStyle(.switch)
+
+            if appState.schedule.isEnabled {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
                         Text("Start:")
                             .frame(width: 40, alignment: .leading)
-                        DatePicker("", selection: $schedule.startTime, displayedComponents: .hourAndMinute)
+                        DatePicker("", selection: $appState.schedule.startTime, displayedComponents: .hourAndMinute)
                             .labelsHidden()
                     }
 
                     HStack {
                         Text("Stop:")
                             .frame(width: 40, alignment: .leading)
-                        DatePicker("", selection: $schedule.stopTime, displayedComponents: .hourAndMinute)
+                        DatePicker("", selection: $appState.schedule.stopTime, displayedComponents: .hourAndMinute)
                             .labelsHidden()
                     }
                 }
@@ -56,10 +134,5 @@ struct MenuBarView: View {
         }
         .padding()
         .frame(width: 220)
-        .onAppear {
-            schedule.onScheduleChange = { shouldRun in
-                mouseMover.isRunning = shouldRun
-            }
-        }
     }
 }
