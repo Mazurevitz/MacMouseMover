@@ -1,0 +1,24 @@
+{
+    "configurations": [
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:MacMouseMover}",
+            "name": "Debug MacMouseMover",
+            "target": "MacMouseMover",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug MacMouseMover"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:MacMouseMover}",
+            "name": "Release MacMouseMover",
+            "target": "MacMouseMover",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release MacMouseMover"
+        }
+    ]
+}
