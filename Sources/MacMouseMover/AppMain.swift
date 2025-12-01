@@ -117,6 +117,13 @@ struct MenuBarView: View {
                     NotificationCenter.default.post(name: NSNotification.Name("UpdateIcon"), object: nil)
                 }
 
+            Picker("Interval", selection: $appState.mouseMover.interval) {
+                ForEach(JiggleInterval.allCases, id: \.self) { interval in
+                    Text(interval.label).tag(interval)
+                }
+            }
+            .pickerStyle(.menu)
+
             Divider()
 
             Toggle("Launch at Login", isOn: $appState.launchAtLogin.isEnabled)

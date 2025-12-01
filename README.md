@@ -4,6 +4,8 @@ A lightweight, open-source macOS menubar app that prevents your Mac from sleepin
 
 Perfect for keeping your screen awake during presentations, long downloads, or when you need to appear "active" while working remotely.
 
+![MacMouseMover Screenshot](screenshot.png)
+
 ## Features
 
 - **Menubar-only** — lives quietly in your menubar, no dock icon or windows
@@ -11,6 +13,7 @@ Perfect for keeping your screen awake during presentations, long downloads, or w
 - **Scheduling** — set different schedules for weekdays and weekends
 - **Battery-aware** — optionally pause when running on battery power
 - **Launch at login** — start automatically when you log in
+- **Configurable interval** — choose 30s, 1m, 2m, or 5m between movements
 - **Invisible movement** — tiny 1-pixel movement that returns to original position
 - **Persistent settings** — remembers your preferences across restarts
 

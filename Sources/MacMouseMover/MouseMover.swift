@@ -2,8 +2,29 @@ import Foundation
 import CoreGraphics
 import AppKit
 
+enum JiggleInterval: Int, CaseIterable {
+    case thirtySeconds = 30
+    case oneMinute = 60
+    case twoMinutes = 120
+    case fiveMinutes = 300
+
+    var label: String {
+        switch self {
+        case .thirtySeconds: return "30 seconds"
+        case .oneMinute: return "1 minute"
+        case .twoMinutes: return "2 minutes"
+        case .fiveMinutes: return "5 minutes"
+        }
+    }
+
+    var seconds: TimeInterval {
+        return TimeInterval(rawValue)
+    }
+}
+
 final class MouseMover: ObservableObject {
     private static let isRunningKey = "MouseMover.isRunning"
+    private static let intervalKey = "MouseMover.interval"
 
     @Published var isRunning: Bool = UserDefaults.standard.bool(forKey: MouseMover.isRunningKey) {
         didSet {
@@ -16,6 +37,15 @@ final class MouseMover: ObservableObject {
         }
     }
 
+    @Published var interval: JiggleInterval = JiggleInterval(rawValue: UserDefaults.standard.integer(forKey: MouseMover.intervalKey)) ?? .thirtySeconds {
+        didSet {
+            UserDefaults.standard.set(interval.rawValue, forKey: MouseMover.intervalKey)
+            if isRunning {
+                startJiggling()
+            }
+        }
+    }
+
     init() {
         if isRunning {
             startJiggling()
@@ -23,14 +53,13 @@ final class MouseMover: ObservableObject {
     }
 
     private var timer: Timer?
-    private let jiggleInterval: TimeInterval = 30.0
 
     private func startJiggling() {
         stopJiggling()
 
         jiggle()
 
-        timer = Timer.scheduledTimer(withTimeInterval: jiggleInterval, repeats: true) { [weak self] _ in
+        timer = Timer.scheduledTimer(withTimeInterval: interval.seconds, repeats: true) { [weak self] _ in
             self?.jiggle()
         }
     }
