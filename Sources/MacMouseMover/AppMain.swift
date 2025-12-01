@@ -1,6 +1,10 @@
 import SwiftUI
 import AppKit
 
+extension Notification.Name {
+    static let updateIcon = Notification.Name("UpdateIcon")
+}
+
 class AppState: ObservableObject {
     static let shared = AppState()
     @Published var mouseMover = MouseMover()
@@ -21,12 +25,12 @@ class AppState: ObservableObject {
                 self.wasRunningBeforeBattery = self.mouseMover.isRunning
                 if self.mouseMover.isRunning {
                     self.mouseMover.isRunning = false
-                    NotificationCenter.default.post(name: NSNotification.Name("UpdateIcon"), object: nil)
+                    NotificationCenter.default.post(name: .updateIcon, object: nil)
                 }
             } else {
                 if self.wasRunningBeforeBattery {
                     self.mouseMover.isRunning = true
-                    NotificationCenter.default.post(name: NSNotification.Name("UpdateIcon"), object: nil)
+                    NotificationCenter.default.post(name: .updateIcon, object: nil)
                 }
             }
         }
@@ -64,7 +68,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(updateIcon),
-            name: NSNotification.Name("UpdateIcon"),
+            name: .updateIcon,
             object: nil
         )
     }
@@ -122,7 +126,7 @@ struct MenuBarView: View {
                 .toggleStyle(.switch)
                 .font(.headline)
                 .onChange(of: appState.mouseMover.isRunning) { _ in
-                    NotificationCenter.default.post(name: NSNotification.Name("UpdateIcon"), object: nil)
+                    NotificationCenter.default.post(name: .updateIcon, object: nil)
                 }
 
             Picker("Interval", selection: $appState.mouseMover.interval) {

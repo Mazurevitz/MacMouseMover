@@ -7,15 +7,19 @@ final class LaunchAtLogin: ObservableObject {
     @Published var isEnabled: Bool = UserDefaults.standard.bool(forKey: LaunchAtLogin.key) {
         didSet {
             UserDefaults.standard.set(isEnabled, forKey: LaunchAtLogin.key)
-            updateLoginItem()
+            syncLoginItem()
         }
     }
 
     init() {
-        updateLoginItem()
+        // Sync actual system state with our stored preference
+        let systemEnabled = SMAppService.mainApp.status == .enabled
+        if isEnabled != systemEnabled {
+            syncLoginItem()
+        }
     }
 
-    private func updateLoginItem() {
+    private func syncLoginItem() {
         do {
             if isEnabled {
                 try SMAppService.mainApp.register()
