@@ -33,17 +33,19 @@ This app is fully open-source. You can inspect every line of code before buildin
 
 ## Installation
 
+### Download (Easiest)
+
+1. Download `MacMouseMover.zip` from the [Releases](https://github.com/Mazurevitz/MacMouseMover/releases) page
+2. Extract and move `MacMouseMover.app` to Applications
+3. Right-click the app → **Open** (required once for unsigned apps)
+4. Grant Accessibility permission when prompted
+
 ### Build from Source
 
 ```bash
 git clone https://github.com/Mazurevitz/MacMouseMover.git
 cd MacMouseMover
 swift build -c release
-```
-
-### Install to Applications
-
-```bash
 mkdir -p /Applications/MacMouseMover.app/Contents/MacOS
 cp .build/release/MacMouseMover /Applications/MacMouseMover.app/Contents/MacOS/
 cp Sources/MacMouseMover/Info.plist /Applications/MacMouseMover.app/Contents/
