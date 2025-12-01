@@ -69,6 +69,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         )
     }
 
+    func applicationWillTerminate(_ notification: Notification) {
+        if let monitor = eventMonitor {
+            NSEvent.removeMonitor(monitor)
+            eventMonitor = nil
+        }
+        NotificationCenter.default.removeObserver(self)
+    }
+
     @objc func handleClick(_ sender: NSStatusBarButton) {
         guard let event = NSApp.currentEvent else { return }
 

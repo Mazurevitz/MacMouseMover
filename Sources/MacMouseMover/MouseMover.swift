@@ -73,7 +73,10 @@ final class MouseMover: ObservableObject {
 
     private func jiggle() {
         let currentLocation = NSEvent.mouseLocation
-        let screenHeight = NSScreen.main?.frame.height ?? 0
+
+        // Find the screen containing the mouse cursor
+        let screen = NSScreen.screens.first { NSMouseInRect(currentLocation, $0.frame, false) } ?? NSScreen.main
+        let screenHeight = screen?.frame.maxY ?? 0
 
         // Move 1 pixel in alternating directions
         let offset: CGFloat = jiggleDirection ? 1.0 : -1.0

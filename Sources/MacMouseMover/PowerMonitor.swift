@@ -15,6 +15,7 @@ final class PowerMonitor: ObservableObject {
     var onPowerChange: ((Bool) -> Void)?
 
     private var runLoopSource: CFRunLoopSource?
+    private var runLoop: CFRunLoop?
 
     init() {
         isOnBattery = checkBatteryStatus()
@@ -30,7 +31,8 @@ final class PowerMonitor: ObservableObject {
             monitor.powerSourceChanged()
         }, context).takeRetainedValue()
 
-        CFRunLoopAddSource(CFRunLoopGetCurrent(), runLoopSource, .defaultMode)
+        runLoop = CFRunLoopGetCurrent()
+        CFRunLoopAddSource(runLoop, runLoopSource, .defaultMode)
     }
 
     private func powerSourceChanged() {
@@ -65,8 +67,8 @@ final class PowerMonitor: ObservableObject {
     }
 
     deinit {
-        if let source = runLoopSource {
-            CFRunLoopRemoveSource(CFRunLoopGetCurrent(), source, .defaultMode)
+        if let source = runLoopSource, let loop = runLoop {
+            CFRunLoopRemoveSource(loop, source, .defaultMode)
         }
     }
 }
