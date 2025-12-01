@@ -14,6 +14,7 @@ Perfect for keeping your screen awake during presentations, long downloads, or w
 - **Battery-aware** — optionally pause when running on battery power
 - **Launch at login** — start automatically when you log in
 - **Configurable interval** — choose 30s, 1m, 2m, or 5m between movements
+- **Randomization** — optional random variation in timing and movement distance
 - **Invisible movement** — tiny 1-pixel movement that returns to original position
 - **Persistent settings** — remembers your preferences across restarts
 

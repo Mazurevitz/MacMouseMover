@@ -136,6 +136,9 @@ struct MenuBarView: View {
             }
             .pickerStyle(.menu)
 
+            Toggle("Randomize", isOn: $appState.mouseMover.randomize)
+                .toggleStyle(.switch)
+
             Divider()
 
             Toggle("Launch at Login", isOn: $appState.launchAtLogin.isEnabled)

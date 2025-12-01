@@ -25,6 +25,7 @@ enum JiggleInterval: Int, CaseIterable {
 final class MouseMover: ObservableObject {
     private static let isRunningKey = "MouseMover.isRunning"
     private static let intervalKey = "MouseMover.interval"
+    private static let randomizeKey = "MouseMover.randomize"
 
     @Published var isRunning: Bool = UserDefaults.standard.bool(forKey: MouseMover.isRunningKey) {
         didSet {
@@ -46,6 +47,15 @@ final class MouseMover: ObservableObject {
         }
     }
 
+    @Published var randomize: Bool = UserDefaults.standard.bool(forKey: MouseMover.randomizeKey) {
+        didSet {
+            UserDefaults.standard.set(randomize, forKey: MouseMover.randomizeKey)
+            if isRunning {
+                startJiggling()
+            }
+        }
+    }
+
     init() {
         if isRunning {
             startJiggling()
@@ -54,14 +64,25 @@ final class MouseMover: ObservableObject {
 
     private var timer: Timer?
 
+    private func randomizedInterval() -> TimeInterval {
+        let base = interval.seconds
+        // Vary by ±20%
+        let variance = base * 0.2
+        return base + Double.random(in: -variance...variance)
+    }
+
+    private func scheduleNextJiggle() {
+        let nextInterval = randomize ? randomizedInterval() : interval.seconds
+        timer = Timer.scheduledTimer(withTimeInterval: nextInterval, repeats: false) { [weak self] _ in
+            self?.jiggle()
+            self?.scheduleNextJiggle()
+        }
+    }
+
     private func startJiggling() {
         stopJiggling()
-
         jiggle()
-
-        timer = Timer.scheduledTimer(withTimeInterval: interval.seconds, repeats: true) { [weak self] _ in
-            self?.jiggle()
-        }
+        scheduleNextJiggle()
     }
 
     private func stopJiggling() {
@@ -78,8 +99,9 @@ final class MouseMover: ObservableObject {
         let screen = NSScreen.screens.first { NSMouseInRect(currentLocation, $0.frame, false) } ?? NSScreen.main
         let screenHeight = screen?.frame.maxY ?? 0
 
-        // Move 1 pixel in alternating directions
-        let offset: CGFloat = jiggleDirection ? 1.0 : -1.0
+        // Move in alternating directions with optional randomization
+        let baseOffset: CGFloat = jiggleDirection ? 1.0 : -1.0
+        let offset: CGFloat = randomize ? baseOffset * CGFloat.random(in: 1.0...3.0) : baseOffset
         jiggleDirection.toggle()
 
         let movedPoint = CGPoint(
