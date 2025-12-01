@@ -38,6 +38,11 @@ cp Sources/MacMouseMover/Info.plist /Applications/MacMouseMover.app/Contents/
 
 Then launch from Applications or Spotlight.
 
+## Usage
+
+- **Left-click** the menubar icon to toggle jiggler on/off
+- **Right-click** to open settings
+
 ## Permissions
 
 On first run, grant Accessibility permission in **System Settings > Privacy & Security > Accessibility** to allow mouse event posting.
