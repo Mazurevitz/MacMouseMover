@@ -40,19 +40,42 @@ final class MouseMover: ObservableObject {
         timer = nil
     }
 
+    private var jiggleDirection: Bool = false
+
     private func jiggle() {
         let currentLocation = NSEvent.mouseLocation
-
         let screenHeight = NSScreen.main?.frame.height ?? 0
-        let cgPoint = CGPoint(x: currentLocation.x, y: screenHeight - currentLocation.y)
 
-        let event = CGEvent(
+        // Move 1 pixel in alternating directions
+        let offset: CGFloat = jiggleDirection ? 1.0 : -1.0
+        jiggleDirection.toggle()
+
+        let movedPoint = CGPoint(
+            x: currentLocation.x + offset,
+            y: screenHeight - currentLocation.y
+        )
+
+        // Move to offset position
+        let moveEvent = CGEvent(
             mouseEventSource: nil,
             mouseType: .mouseMoved,
-            mouseCursorPosition: cgPoint,
+            mouseCursorPosition: movedPoint,
             mouseButton: .left
         )
-        event?.post(tap: .cghidEventTap)
+        moveEvent?.post(tap: .cghidEventTap)
+
+        // Move back to original position
+        let returnPoint = CGPoint(
+            x: currentLocation.x,
+            y: screenHeight - currentLocation.y
+        )
+        let returnEvent = CGEvent(
+            mouseEventSource: nil,
+            mouseType: .mouseMoved,
+            mouseCursorPosition: returnPoint,
+            mouseButton: .left
+        )
+        returnEvent?.post(tap: .cghidEventTap)
     }
 
     deinit {
