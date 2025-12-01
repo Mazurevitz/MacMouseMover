@@ -130,18 +130,44 @@ struct MenuBarView: View {
 
             if appState.schedule.isEnabled {
                 VStack(alignment: .leading, spacing: 8) {
+                    Text("Weekdays")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+
                     HStack {
                         Text("Start:")
                             .frame(width: 40, alignment: .leading)
-                        DatePicker("", selection: $appState.schedule.startTime, displayedComponents: .hourAndMinute)
+                        DatePicker("", selection: $appState.schedule.weekdayStartTime, displayedComponents: .hourAndMinute)
                             .labelsHidden()
                     }
 
                     HStack {
                         Text("Stop:")
                             .frame(width: 40, alignment: .leading)
-                        DatePicker("", selection: $appState.schedule.stopTime, displayedComponents: .hourAndMinute)
+                        DatePicker("", selection: $appState.schedule.weekdayStopTime, displayedComponents: .hourAndMinute)
                             .labelsHidden()
+                    }
+
+                    Divider()
+
+                    Toggle("Weekend Schedule", isOn: $appState.schedule.weekendScheduleEnabled)
+                        .toggleStyle(.switch)
+                        .font(.subheadline)
+
+                    if appState.schedule.weekendScheduleEnabled {
+                        HStack {
+                            Text("Start:")
+                                .frame(width: 40, alignment: .leading)
+                            DatePicker("", selection: $appState.schedule.weekendStartTime, displayedComponents: .hourAndMinute)
+                                .labelsHidden()
+                        }
+
+                        HStack {
+                            Text("Stop:")
+                                .frame(width: 40, alignment: .leading)
+                            DatePicker("", selection: $appState.schedule.weekendStopTime, displayedComponents: .hourAndMinute)
+                                .labelsHidden()
+                        }
                     }
                 }
                 .padding(.leading, 4)
