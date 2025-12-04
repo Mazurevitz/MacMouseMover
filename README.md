@@ -1,6 +1,6 @@
 # MacMouseMover
 
-A lightweight, open-source macOS menubar app that prevents your Mac from sleeping by simulating subtle mouse movements.
+A lightweight, open-source macOS menubar app that prevents your Mac from sleeping and screen saver from activating.
 
 Perfect for keeping your screen awake during presentations, long downloads, or when you need to appear "active" while working remotely.
 
@@ -15,6 +15,7 @@ Perfect for keeping your screen awake during presentations, long downloads, or w
 - **Launch at login** — start automatically when you log in
 - **Configurable interval** — choose 30s, 1m, 2m, or 5m between movements
 - **Randomization** — optional random variation in timing and movement distance
+- **Prevents screen saver** — uses proper macOS power assertion to block idle sleep
 - **Invisible movement** — tiny 1-pixel movement that returns to original position
 - **Persistent settings** — remembers your preferences across restarts
 

@@ -1,6 +1,7 @@
 import Foundation
 import CoreGraphics
 import AppKit
+import IOKit.pwr_mgt
 
 enum JiggleInterval: Int, CaseIterable {
     case thirtySeconds = 30
@@ -63,6 +64,27 @@ final class MouseMover: ObservableObject {
     }
 
     private var timer: Timer?
+    private var assertionID: IOPMAssertionID = 0
+
+    private func createPowerAssertion() {
+        let reason = "MacMouseMover keeping system awake" as CFString
+        let result = IOPMAssertionCreateWithName(
+            kIOPMAssertionTypePreventUserIdleDisplaySleep as CFString,
+            IOPMAssertionLevel(kIOPMAssertionLevelOn),
+            reason,
+            &assertionID
+        )
+        if result != kIOReturnSuccess {
+            print("Failed to create power assertion")
+        }
+    }
+
+    private func releasePowerAssertion() {
+        if assertionID != 0 {
+            IOPMAssertionRelease(assertionID)
+            assertionID = 0
+        }
+    }
 
     private func randomizedInterval() -> TimeInterval {
         let base = interval.seconds
@@ -81,6 +103,7 @@ final class MouseMover: ObservableObject {
 
     private func startJiggling() {
         stopJiggling()
+        createPowerAssertion()
         jiggle()
         scheduleNextJiggle()
     }
@@ -88,6 +111,7 @@ final class MouseMover: ObservableObject {
     private func stopJiggling() {
         timer?.invalidate()
         timer = nil
+        releasePowerAssertion()
     }
 
     private var jiggleDirection: Bool = false
