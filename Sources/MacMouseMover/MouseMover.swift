@@ -115,8 +115,28 @@ final class MouseMover: ObservableObject {
     }
 
     private var jiggleDirection: Bool = false
+    private let idleThreshold: TimeInterval = 10.0 // Only jiggle if user idle for 10+ seconds
+
+    private func isUserIdle() -> Bool {
+        let idleTime = CGEventSource.secondsSinceLastEventType(
+            .combinedSessionState,
+            eventType: CGEventType(rawValue: ~0)! // All event types
+        )
+        return idleTime >= idleThreshold
+    }
+
+    private func simulateShiftKey() {
+        // Press and release Shift key (keycode 56)
+        let shiftDown = CGEvent(keyboardEventSource: nil, virtualKey: 56, keyDown: true)
+        let shiftUp = CGEvent(keyboardEventSource: nil, virtualKey: 56, keyDown: false)
+        shiftDown?.post(tap: .cghidEventTap)
+        shiftUp?.post(tap: .cghidEventTap)
+    }
 
     private func jiggle() {
+        // Only jiggle if user has been idle - don't disturb active use
+        guard isUserIdle() else { return }
+
         let currentLocation = NSEvent.mouseLocation
 
         // Find the screen containing the mouse cursor
@@ -154,6 +174,9 @@ final class MouseMover: ObservableObject {
             mouseButton: .left
         )
         returnEvent?.post(tap: .cghidEventTap)
+
+        // Simulate Shift key press to keep apps like Teams active
+        simulateShiftKey()
     }
 
     deinit {

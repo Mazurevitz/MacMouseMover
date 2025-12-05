@@ -16,6 +16,8 @@ Perfect for keeping your screen awake during presentations, long downloads, or w
 - **Configurable interval** — choose 30s, 1m, 2m, or 5m between movements
 - **Randomization** — optional random variation in timing and movement distance
 - **Prevents screen saver** — uses proper macOS power assertion to block idle sleep
+- **Keeps Teams/Slack green** — simulates keyboard activity to maintain "Available" status
+- **Smart idle detection** — only activates when you're away, never disturbs active use
 - **Invisible movement** — tiny 1-pixel movement that returns to original position
 - **Persistent settings** — remembers your preferences across restarts
 
