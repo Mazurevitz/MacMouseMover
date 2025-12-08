@@ -1,8 +1,8 @@
 # MacMouseMover
 
-A lightweight, open-source macOS menubar app that prevents your Mac from sleeping and screen saver from activating.
+A lightweight, open-source macOS menubar app that prevents your Mac from going idle and keeps the screen awake.
 
-Perfect for keeping your screen awake during presentations, long downloads, or when you need to appear "active" while working remotely.
+Useful for presentations, monitoring dashboards, long-running tasks, downloads, video calls, or anytime you need your Mac to stay active without manual interaction.
 
 ![MacMouseMover Screenshot](screenshot.jpeg)
 
@@ -13,12 +13,12 @@ Perfect for keeping your screen awake during presentations, long downloads, or w
 - **Scheduling** — set different schedules for weekdays and weekends
 - **Battery-aware** — optionally pause when running on battery power
 - **Launch at login** — start automatically when you log in
-- **Configurable interval** — choose 30s, 1m, 2m, or 5m between movements
-- **Randomization** — optional random variation in timing and movement distance
-- **Prevents screen saver** — uses proper macOS power assertion to block idle sleep
-- **Keeps Teams/Slack green** — simulates keyboard activity to maintain "Available" status
+- **Configurable interval** — choose 30s, 1m, 2m, or 5m between activity
+- **Randomization** — optional random variation in timing and movement
+- **Prevents screen saver** — uses macOS power assertion to prevent idle sleep
+- **Simulates user activity** — keeps the system active for apps that monitor idle state
 - **Smart idle detection** — only activates when you're away, never disturbs active use
-- **Invisible movement** — tiny 1-pixel movement that returns to original position
+- **Invisible operation** — tiny movement that returns to original position
 - **Persistent settings** — remembers your preferences across restarts
 
 ## Privacy & Security
@@ -27,7 +27,7 @@ This app is fully open-source. You can inspect every line of code before buildin
 
 - Collects **no data**
 - Makes **no network requests**
-- Requires only Accessibility permission (to move the mouse)
+- Requires only Accessibility permission (to simulate input)
 - Stores settings locally via UserDefaults
 
 ## Requirements
@@ -61,12 +61,12 @@ Then launch from **Applications** or **Spotlight**.
 
 | Action | Result |
 |--------|--------|
-| Left-click menubar icon | Toggle jiggler on/off |
+| Left-click menubar icon | Toggle on/off |
 | Right-click menubar icon | Open settings |
 
 ## Permissions
 
-**Important:** The app requires Accessibility permission to work. Without it, the app will appear to run but won't actually send any input events.
+**Important:** The app requires Accessibility permission to work. Without it, the app will appear to run but won't actually simulate any activity.
 
 **System Settings → Privacy & Security → Accessibility → Enable MacMouseMover**
 
