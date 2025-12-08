@@ -139,12 +139,25 @@ final class MouseMover: ObservableObject {
         return systemIdleTime >= idleThreshold
     }
 
-    private func simulateShiftKey() {
-        // Press and release Shift key (keycode 56)
-        let shiftDown = CGEvent(keyboardEventSource: nil, virtualKey: 56, keyDown: true)
-        let shiftUp = CGEvent(keyboardEventSource: nil, virtualKey: 56, keyDown: false)
-        shiftDown?.post(tap: .cghidEventTap)
-        shiftUp?.post(tap: .cghidEventTap)
+    // Unused function keys that won't interfere with anything
+    private let unusedKeys: [CGKeyCode] = [
+        105, // F13
+        107, // F14
+        113, // F15
+        106, // F16
+        64,  // F17
+        79,  // F18
+        80   // F19
+    ]
+
+    private func simulateKeyPress() {
+        // Use a random unused key to appear more like real input
+        let keyCode = unusedKeys.randomElement() ?? 113
+
+        let keyDown = CGEvent(keyboardEventSource: nil, virtualKey: keyCode, keyDown: true)
+        let keyUp = CGEvent(keyboardEventSource: nil, virtualKey: keyCode, keyDown: false)
+        keyDown?.post(tap: .cghidEventTap)
+        keyUp?.post(tap: .cghidEventTap)
     }
 
     private func jiggle() {
@@ -192,8 +205,8 @@ final class MouseMover: ObservableObject {
         )
         returnEvent?.post(tap: .cghidEventTap)
 
-        // Simulate Shift key press to keep apps like Teams active
-        simulateShiftKey()
+        // Simulate key press to keep apps like Teams active
+        simulateKeyPress()
 
         // Record when we jiggled so we can distinguish our events from user events
         lastJiggleTime = Date()
