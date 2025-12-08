@@ -66,9 +66,15 @@ Then launch from **Applications** or **Spotlight**.
 
 ## Permissions
 
-On first launch, macOS will prompt you to grant Accessibility permission. This is required to simulate mouse movement.
+**Important:** The app requires Accessibility permission to work. Without it, the app will appear to run but won't actually send any input events.
 
 **System Settings → Privacy & Security → Accessibility → Enable MacMouseMover**
+
+If the app isn't working:
+1. Remove MacMouseMover from Accessibility list
+2. Re-add `/Applications/MacMouseMover.app`
+3. Make sure the toggle is ON
+4. Restart the app
 
 ## Contributing
 
