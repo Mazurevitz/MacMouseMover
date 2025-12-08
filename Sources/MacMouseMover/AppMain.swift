@@ -197,10 +197,16 @@ struct MenuBarView: View {
 
             Divider()
 
-            Button("Quit") {
-                NSApplication.shared.terminate(nil)
+            HStack {
+                Text("v1.5.1")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+                Spacer()
+                Button("Quit") {
+                    NSApplication.shared.terminate(nil)
+                }
+                .keyboardShortcut("q")
             }
-            .keyboardShortcut("q")
         }
         .padding()
         .frame(width: 220)
