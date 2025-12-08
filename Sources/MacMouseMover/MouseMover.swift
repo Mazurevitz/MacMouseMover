@@ -116,13 +116,27 @@ final class MouseMover: ObservableObject {
 
     private var jiggleDirection: Bool = false
     private let idleThreshold: TimeInterval = 10.0 // Only jiggle if user idle for 10+ seconds
+    private var lastJiggleTime: Date?
 
     private func isUserIdle() -> Bool {
-        let idleTime = CGEventSource.secondsSinceLastEventType(
+        let systemIdleTime = CGEventSource.secondsSinceLastEventType(
             .combinedSessionState,
             eventType: CGEventType(rawValue: ~0)! // All event types
         )
-        return idleTime >= idleThreshold
+
+        // If we've jiggled before, check if the system idle time is approximately
+        // equal to time since our last jiggle. If so, the user is still idle
+        // (only our synthetic events reset the timer).
+        if let lastJiggle = lastJiggleTime {
+            let timeSinceOurJiggle = Date().timeIntervalSince(lastJiggle)
+            // If system idle ≈ time since our jiggle (within 2 seconds), user is still idle
+            // If system idle << time since our jiggle, user did something real
+            if abs(systemIdleTime - timeSinceOurJiggle) < 2.0 {
+                return true // User still idle, only our events happened
+            }
+        }
+
+        return systemIdleTime >= idleThreshold
     }
 
     private func simulateShiftKey() {
@@ -135,7 +149,10 @@ final class MouseMover: ObservableObject {
 
     private func jiggle() {
         // Only jiggle if user has been idle - don't disturb active use
-        guard isUserIdle() else { return }
+        guard isUserIdle() else {
+            lastJiggleTime = nil // Reset so next idle check uses threshold
+            return
+        }
 
         let currentLocation = NSEvent.mouseLocation
 
@@ -177,6 +194,9 @@ final class MouseMover: ObservableObject {
 
         // Simulate Shift key press to keep apps like Teams active
         simulateShiftKey()
+
+        // Record when we jiggled so we can distinguish our events from user events
+        lastJiggleTime = Date()
     }
 
     deinit {
