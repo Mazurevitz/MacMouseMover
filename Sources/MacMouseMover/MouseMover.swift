@@ -183,23 +183,11 @@ final class MouseMover: ObservableObject {
         return systemIdleTime >= idleThreshold
     }
 
-    // Unused function keys that won't interfere with anything
-    private let unusedKeys: [CGKeyCode] = [
-        105, // F13
-        107, // F14
-        113, // F15
-        106, // F16
-        64,  // F17
-        79,  // F18
-        80   // F19
-    ]
-
     private func simulateKeyPress() {
-        // Use a random unused key to appear more like real input
-        let keyCode = unusedKeys.randomElement() ?? 113
-
-        let keyDown = CGEvent(keyboardEventSource: nil, virtualKey: keyCode, keyDown: true)
-        let keyUp = CGEvent(keyboardEventSource: nil, virtualKey: keyCode, keyDown: false)
+        // Use Shift key (56) - harmless modifier that won't trigger anything on Windows/Citrix
+        // F13-F19 map to Print Screen, Scroll Lock, etc. on Windows
+        let keyDown = CGEvent(keyboardEventSource: nil, virtualKey: 56, keyDown: true)
+        let keyUp = CGEvent(keyboardEventSource: nil, virtualKey: 56, keyDown: false)
         keyDown?.post(tap: .cghidEventTap)
         keyUp?.post(tap: .cghidEventTap)
     }
