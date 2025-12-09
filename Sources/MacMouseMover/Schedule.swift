@@ -1,6 +1,12 @@
 import Foundation
 import AppKit
 
+// Set to true to enable debug logging, false for production
+private let DEBUG_LOG = true
+private func log(_ message: String) {
+    if DEBUG_LOG { print("[Schedule] \(message)") }
+}
+
 final class Schedule: ObservableObject {
     private static let isEnabledKey = "Schedule.isEnabled"
     private static let weekdayStartTimeKey = "Schedule.weekdayStartTime"
@@ -68,6 +74,7 @@ final class Schedule: ObservableObject {
             object: nil,
             queue: .main
         ) { [weak self] _ in
+            log("System wake detected")
             guard let self = self, self.isEnabled else { return }
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                 self.restartAfterWake()
@@ -79,6 +86,7 @@ final class Schedule: ObservableObject {
             object: nil,
             queue: .main
         ) { [weak self] _ in
+            log("Screen unlock detected")
             guard let self = self, self.isEnabled else { return }
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                 self.restartAfterWake()
@@ -88,10 +96,13 @@ final class Schedule: ObservableObject {
 
     private func restartAfterWake() {
         guard isEnabled else { return }
+        log("Restarting after wake")
         // Restart timer and force schedule check
         startScheduleTimer()
         // Force trigger if within schedule (don't rely on state change detection)
-        if isCurrentTimeWithinSchedule() {
+        let withinSchedule = isCurrentTimeWithinSchedule()
+        log("Within schedule: \(withinSchedule)")
+        if withinSchedule {
             onScheduleChange?(true)
         }
     }

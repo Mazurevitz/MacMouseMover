@@ -3,6 +3,12 @@ import CoreGraphics
 import AppKit
 import IOKit.pwr_mgt
 
+// Set to true to enable debug logging, false for production
+private let DEBUG_LOG = true
+private func log(_ message: String) {
+    if DEBUG_LOG { print("[MMM] \(message)") }
+}
+
 enum JiggleInterval: Int, CaseIterable {
     case thirtySeconds = 30
     case oneMinute = 60
@@ -71,10 +77,12 @@ final class MouseMover: ObservableObject {
             object: nil,
             queue: .main
         ) { [weak self] _ in
+            log("System wake detected")
             guard let self = self, self.isRunning else { return }
             // Small delay to let system fully wake
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                 if self.isRunning {
+                    log("Restarting after wake")
                     self.startJiggling()
                 }
             }
@@ -86,9 +94,11 @@ final class MouseMover: ObservableObject {
             object: nil,
             queue: .main
         ) { [weak self] _ in
+            log("Screen unlock detected")
             guard let self = self, self.isRunning else { return }
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                 if self.isRunning {
+                    log("Restarting after unlock")
                     self.startJiggling()
                 }
             }
@@ -134,6 +144,7 @@ final class MouseMover: ObservableObject {
     }
 
     private func startJiggling() {
+        log("Starting")
         stopJiggling()
         createPowerAssertion()
         jiggle()
@@ -141,6 +152,7 @@ final class MouseMover: ObservableObject {
     }
 
     private func stopJiggling() {
+        log("Stopping")
         timer?.invalidate()
         timer = nil
         releasePowerAssertion()
@@ -195,10 +207,12 @@ final class MouseMover: ObservableObject {
     private func jiggle() {
         // Only jiggle if user has been idle - don't disturb active use
         guard isUserIdle() else {
+            log("Skipped - user active")
             lastJiggleTime = nil // Reset so next idle check uses threshold
             return
         }
 
+        log("Jiggling")
         let currentLocation = NSEvent.mouseLocation
 
         // Find the screen containing the mouse cursor
