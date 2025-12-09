@@ -204,12 +204,35 @@ final class MouseMover: ObservableObject {
         keyUp?.post(tap: .cghidEventTap)
     }
 
+    private var consecutiveFailures = 0
+
     private func jiggle() {
         // Only jiggle if user has been idle - don't disturb active use
         guard isUserIdle() else {
             log("Skipped - user active")
             lastJiggleTime = nil // Reset so next idle check uses threshold
+            consecutiveFailures = 0 // User activity means system is responsive
             return
+        }
+
+        // Check if previous jiggle actually worked by comparing idle time
+        if let lastJiggle = lastJiggleTime {
+            let timeSinceJiggle = Date().timeIntervalSince(lastJiggle)
+            let systemIdle = CGEventSource.secondsSinceLastEventType(.combinedSessionState, eventType: CGEventType(rawValue: ~0)!)
+
+            // If system idle is much greater than time since our jiggle, events aren't registering
+            if systemIdle > timeSinceJiggle + 5.0 {
+                consecutiveFailures += 1
+                log("WARNING: Events not registering (idle=\(Int(systemIdle))s, expected=\(Int(timeSinceJiggle))s) failures=\(consecutiveFailures)")
+
+                if consecutiveFailures >= 3 {
+                    log("ERROR: CGEvents failing - restarting app")
+                    restartApp()
+                    return
+                }
+            } else {
+                consecutiveFailures = 0
+            }
         }
 
         log("Jiggling")
@@ -256,6 +279,18 @@ final class MouseMover: ObservableObject {
 
         // Record when we jiggled so we can distinguish our events from user events
         lastJiggleTime = Date()
+    }
+
+    private func restartApp() {
+        let url = Bundle.main.bundleURL
+        let task = Process()
+        task.launchPath = "/usr/bin/open"
+        task.arguments = ["-n", url.path]
+        try? task.run()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            NSApplication.shared.terminate(nil)
+        }
     }
 
     deinit {
