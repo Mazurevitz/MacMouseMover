@@ -1,4 +1,5 @@
 import Foundation
+import AppKit
 
 final class Schedule: ObservableObject {
     private static let isEnabledKey = "Schedule.isEnabled"
@@ -55,8 +56,43 @@ final class Schedule: ObservableObject {
     }
 
     init() {
+        setupWakeNotification()
         if isEnabled {
             startScheduleTimer()
+        }
+    }
+
+    private func setupWakeNotification() {
+        NSWorkspace.shared.notificationCenter.addObserver(
+            forName: NSWorkspace.didWakeNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            guard let self = self, self.isEnabled else { return }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                self.restartAfterWake()
+            }
+        }
+
+        DistributedNotificationCenter.default().addObserver(
+            forName: NSNotification.Name("com.apple.screenIsUnlocked"),
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            guard let self = self, self.isEnabled else { return }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                self.restartAfterWake()
+            }
+        }
+    }
+
+    private func restartAfterWake() {
+        guard isEnabled else { return }
+        // Restart timer and force schedule check
+        startScheduleTimer()
+        // Force trigger if within schedule (don't rely on state change detection)
+        if isCurrentTimeWithinSchedule() {
+            onScheduleChange?(true)
         }
     }
 

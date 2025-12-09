@@ -198,7 +198,7 @@ struct MenuBarView: View {
             Divider()
 
             HStack {
-                Text("v1.5.3")
+                Text("v1.5.4")
                     .font(.caption2)
                     .foregroundColor(.secondary)
                 Spacer()
