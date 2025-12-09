@@ -58,8 +58,40 @@ final class MouseMover: ObservableObject {
     }
 
     init() {
+        setupWakeNotification()
         if isRunning {
             startJiggling()
+        }
+    }
+
+    private func setupWakeNotification() {
+        // Restart jiggling after system wake to re-establish power assertion and timers
+        NSWorkspace.shared.notificationCenter.addObserver(
+            forName: NSWorkspace.didWakeNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            guard let self = self, self.isRunning else { return }
+            // Small delay to let system fully wake
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                if self.isRunning {
+                    self.startJiggling()
+                }
+            }
+        }
+
+        // Also handle screen unlock
+        DistributedNotificationCenter.default().addObserver(
+            forName: NSNotification.Name("com.apple.screenIsUnlocked"),
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            guard let self = self, self.isRunning else { return }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                if self.isRunning {
+                    self.startJiggling()
+                }
+            }
         }
     }
 
